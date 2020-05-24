@@ -34,3 +34,9 @@ Run to execute the project.
 ```bash
 $ make run
 ```
+
+## `clean`
+Run to clean compile artifacts.
+```bash
+$ make clean
+```
