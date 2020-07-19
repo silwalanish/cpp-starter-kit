@@ -23,7 +23,7 @@ INTERMEDIATE_FILES := $(patsubst $(SOURCE_DIR)/%.cpp, $(INTERMEDIATE_DIR)/%.o, $
 
 EXECUTABLE := $(OUTPUT_DIR)/${EXECUTABLE_NAME}
 
-.PHONY = build compile run clean add-submodules
+.PHONY = build compile run clean submodule
 
 all: $(EXECUTABLE)
 
@@ -32,15 +32,15 @@ build: $(EXECUTABLE)
 compile: $(INTERMEDIATE_FILES)
 
 $(OUTPUT_DIR)/$(PROJECT_NAME).o: $(INTERMEDIATE_FILES)
-	@$(ECHO_NO_NEW_LINE) "$(BLUE)[$(TARGET_OS)][$(TARGET_ARCH)] Linking...\t"
+	@$(ECHO_NO_NEW_LINE) "$(BLUE)[$(TARGET_OS) $(TARGET_ARCH)] Linking...\t"
 	@$(MKDIR) $(OUTPUT_DIR)
 	@$(CC) $(CFLAGS) $(CCFLAGS) $(DEBUG_FLAGS) $^ -o $@ -L$(DEPENDENCIES) $(LINK_PARAMS)
 	@$(ECHO_SUCCESS)
 
 $(INTERMEDIATE_DIR)/%.o: $(SOURCE_DIR)/%.cpp $(SOURCE_DIR)/%.hpp
 	@$(MKDIR) $(@D)
-	@$(ECHO_NO_NEW_LINE) "$(BLUE)[$(TARGET_OS)][$(TARGET_ARCH)] Compiling $<...\t"
-	@$(CC) $(CFLAGS) $(CCFLAGS) $(DEBUG_FLAGS) -c $< -I $(INCLUDES_DIR) -I $(VENDOR_DIR) -o $@
+	@$(ECHO_NO_NEW_LINE) "$(BLUE)[$(TARGET_OS) $(TARGET_ARCH)] Compiling $<...\t"
+	@$(CC) $(CFLAGS) $(CCFLAGS) $(DEBUG_FLAGS) -c $< -I $(INCLUDES_DIR) -I $(ADDITIONAL_INCLUDES) -o $@
 	@$(ECHO_SUCCESS)
 
 $(SOURCE_DIR)/%.hpp: ;
@@ -55,5 +55,5 @@ clean:
 	@$(RM) -rf $(BIN_DIR)
 	@$(ECHO_SUCCESS)
 
-add-submodules:
-	@$(CD) $(VENDOR_DIR) && git submodule add $(module)
+submodule:
+	@$(CD) $(VENDOR_DIR) && $(GIT) submodule add $(module)

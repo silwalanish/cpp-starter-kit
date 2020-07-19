@@ -1,6 +1,7 @@
 CC := g++
 RM := rm
 CD := cd
+GIT := git
 MKDIR := mkdir -p
 SHELL := /bin/bash
 
