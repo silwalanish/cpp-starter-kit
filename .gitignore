@@ -1,4 +1,5 @@
+# You can uncomment following line if you aren't using vscode
+# .vscode/
+
+bin/
 build/
-output/
-build/
-output/
