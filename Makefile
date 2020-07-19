@@ -1,75 +1,59 @@
-PROJECT_NAME = projectname
-PROJECT_VERSION = 1.0
+include MakeSettings.mk
+include ProjectInfo.mk
+include BuildOptions.mk
 
-PROJECT_STRUCTURE = build output deps src deps/include deps/libs
-GIT_TRACKED = deps src deps/include deps/libs
-# BUILD_PARAMS set this to the extra params passed in linking
+TARGET_OS ?= Windows
+TARGET_ARCH ?= x64
+BUILD_MODE ?= $(RELEASE_MODE)
+EXECUTABLE_NAME ?= $(PROJECT_NAME).o
 
-SHELL = /bin/bash
+ifeq "$(BUILD_MODE)" "$(DEBUG_MODE)"
+DEBUG_FLAGS := -g
+endif
 
-SRC_DIR = src
-OBJ_DIR = build
-OUTPUT_DIR = output
+TARGET_SYSTEM := $(BUILD_MODE)/$(TARGET_OS)/$(TARGET_ARCH)
+DEPENDENCIES := $(LIBS_DIR)/$(TARGET_SYSTEM)
 
-DEPS_DIR = deps
-INCLUDE_DIR = $(DEPS_DIR)/include
-LIBS_DIR = $(DEPS_DIR)/libs
+INTERMEDIATE_DIR := $(BUILD_DIR)/$(TARGET_SYSTEM)
+OUTPUT_DIR := $(BIN_DIR)/$(BUILD_MODE)
 
-SRCS := $(shell find $(SRC_DIR) -name "*.cpp")
-OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRCS))
+SOURCE_FILES := $(shell find $(SOURCE_DIR) -name "*.cpp")
+HEADER_FILES := $(shell find $(SOURCE_DIR) -name "*.hpp")
+INTERMEDIATE_FILES := $(patsubst $(SOURCE_DIR)/%.cpp, $(INTERMEDIATE_DIR)/%.o, $(SOURCE_FILES))
 
-TICK = \u2714
-DEFAULT_COLOR = \033[0m
-RED = \033[0;31m
-GREEN = \033[0;32m
-YELLOW = \033[0;33m
-BLUE = \033[0;34m
+EXECUTABLE := $(OUTPUT_DIR)/${EXECUTABLE_NAME}
 
-.PHONY = build compile run clean setup
+.PHONY = build compile run clean add-submodules
 
-all: $(OUTPUT_DIR)/$(PROJECT_NAME).o
+all: $(EXECUTABLE)
 
-build: $(OUTPUT_DIR)/$(PROJECT_NAME).o
+build: $(EXECUTABLE)
 
-compile: $(OBJS)
+compile: $(INTERMEDIATE_FILES)
 
-$(OUTPUT_DIR)/$(PROJECT_NAME).o: $(OBJS)
-	@echo -e -n "$(BLUE)Linking...\t"
-	@g++ $^ -o $@ -L$(LIBS_DIR) $(BUILD_PARAMS)
-	@echo -e "$(GREEN)$(TICK)$(DEFAULT_COLOR)"
+$(OUTPUT_DIR)/$(PROJECT_NAME).o: $(INTERMEDIATE_FILES)
+	@$(ECHO_NO_NEW_LINE) "$(BLUE)[$(TARGET_OS)][$(TARGET_ARCH)] Linking...\t"
+	@$(MKDIR) $(OUTPUT_DIR)
+	@$(CC) $(CFLAGS) $(CCFLAGS) $(DEBUG_FLAGS) $^ -o $@ -L$(DEPENDENCIES) $(LINK_PARAMS)
+	@$(ECHO_SUCCESS)
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
-	@mkdir -p $(@D)
-	@echo -e -n "$(BLUE)Compiling $<...\t"
-	@g++ -c $< -I $(INCLUDE_DIR)
-	@echo -e "$(GREEN)$(TICK)$(DEFAULT_COLOR)"
-	@mv $(@F) $(@D)
+$(INTERMEDIATE_DIR)/%.o: $(SOURCE_DIR)/%.cpp $(SOURCE_DIR)/%.hpp
+	@$(MKDIR) $(@D)
+	@$(ECHO_NO_NEW_LINE) "$(BLUE)[$(TARGET_OS)][$(TARGET_ARCH)] Compiling $<...\t"
+	@$(CC) $(CFLAGS) $(CCFLAGS) $(DEBUG_FLAGS) -c $< -I $(INCLUDES_DIR) -I $(VENDOR_DIR) -o $@
+	@$(ECHO_SUCCESS)
 
-run: $(OUTPUT_DIR)/$(PROJECT_NAME).o
-	@echo -e "$(YELLOW)Starting $^...$(DEFAULT_COLOR)"
-	@./$^
+$(SOURCE_DIR)/%.hpp: ;
+
+run: $(EXECUTABLE)
+	@$(ECHO) "$(YELLOW)Starting $^...$(DEFAULT_COLOR)"
+	@$(CD) $(OUTPUT_DIR) && ./$(PROJECT_NAME).o
 
 clean:
-	@echo -e -n "$(RED)Cleaning...\t"
-	@rm -rf $(OBJS)
-	@echo -e "$(GREEN)$(TICK)$(DEFAULT_COLOR)"
+	@$(ECHO_NO_NEW_LINE) "$(RED)Cleaning...\t"
+	@$(RM) -rf $(BUILD_DIR)
+	@$(RM) -rf $(BIN_DIR)
+	@$(ECHO_SUCCESS)
 
-setup:
-	@echo -e -n "$(YELLOW)Creating project structure...\t"
-	@mkdir -p $(PROJECT_STRUCTURE)
-	@echo -e "$(GREEN)$(TICK)$(DEFAULT_COLOR)"
-ifeq (, $(shell which git))
-	@echo -e "$(RED)Git not installed.$(DEFAULT_COLOR)"
-else
-	@if [[ ! -d .git ]]; then \
-		echo -e "$(GREEN)Initializing Git"; \
-		git init; \
-		for i in $(GIT_TRACKED); \
-		do \
-			touch $$i/.gitkeep; \
-		done; \
-		echo -e -n "$(GREEN)Generating .gitignore file...\t"; \
-		echo -e "build/\noutput/" >> .gitignore; \
-		echo -e "$(GREEN)$(TICK)$(DEFAULT_COLOR)"; \
-	fi
-endif
+add-submodules:
+	@$(CD) $(VENDOR_DIR) && git submodule add $(module)
