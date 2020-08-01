@@ -40,7 +40,7 @@ $(OUTPUT_DIR)/$(PROJECT_NAME).o: $(INTERMEDIATE_FILES)
 $(INTERMEDIATE_DIR)/%.o: $(SOURCE_DIR)/%.cpp $(SOURCE_DIR)/%.hpp
 	@$(MKDIR) $(@D)
 	@$(ECHO_NO_NEW_LINE) "$(BLUE)[$(TARGET_OS) $(TARGET_ARCH)] Compiling $<...\t"
-	@$(CC) $(CFLAGS) $(CCFLAGS) $(DEBUG_FLAGS) -c $< -I $(INCLUDES_DIR) -I $(ADDITIONAL_INCLUDES) -o $@
+	@$(CC) $(CFLAGS) $(CCFLAGS) $(DEBUG_FLAGS) -c $< -I $(INCLUDES_DIR) $(ADDITIONAL_INCLUDES) -o $@
 	@$(ECHO_SUCCESS)
 
 $(SOURCE_DIR)/%.hpp: ;
@@ -57,3 +57,6 @@ clean:
 
 submodule:
 	@$(CD) $(VENDOR_DIR) && $(GIT) submodule add $(module)
+
+setup-vendor:
+	@$(GIT) submodule update --init --recursive

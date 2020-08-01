@@ -6,6 +6,12 @@ A simple attempt at making building c++ projects easier.
 - Update the name and description of the project in the file `ProjectInfo.mk`.
 - Add any build parameters in `BuildOptions.mk`.
 
+## `setup-vendor`
+Fetch the submodules.
+```bash
+$ make setup-vendor
+```
+
 ## `compile`
 Run to compile the project.
 ```bash
