@@ -64,6 +64,12 @@ clean:
 submodule:
 	@$(CD) $(VENDOR_DIR) && $(GIT) submodule add $(module)
 
+## remove-submodule : Remove a git sub module. e.g. make remove-submodule module=glm
+remove-submodule:
+	@$(GIT) submodule deinit $(VENDOR_DIR)/$(module)
+	@$(RM) -rf .git/modules/$(VENDOR_DIR)/$(module)
+	@$(GIT) rm -f $(VENDOR_DIR)/$(module)
+
 ## setup-vendor : Fetch all the sub modules.
 setup-vendor:
 	@$(GIT) submodule update --init --recursive
