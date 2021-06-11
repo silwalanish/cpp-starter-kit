@@ -23,12 +23,15 @@ INTERMEDIATE_FILES := $(patsubst $(SOURCE_DIR)/%.cpp, $(INTERMEDIATE_DIR)/%.o, $
 
 EXECUTABLE := $(OUTPUT_DIR)/${EXECUTABLE_NAME}
 
-.PHONY = build compile run clean submodule
+.PHONY = build compile run clean submodule help
 
+## all : Generates executable
 all: $(EXECUTABLE)
 
+## build : Generates executable
 build: $(EXECUTABLE)
 
+## compile : Compiles and generates intermediate files.
 compile: $(INTERMEDIATE_FILES)
 
 $(OUTPUT_DIR)/$(PROJECT_NAME).o: $(INTERMEDIATE_FILES)
@@ -45,18 +48,28 @@ $(INTERMEDIATE_DIR)/%.o: $(SOURCE_DIR)/%.cpp $(INCLUDES_DIR)/%.hpp
 
 $(INCLUDES_DIR)/%.hpp: ;
 
+## run : Run the executable file.
 run: $(EXECUTABLE)
 	@$(ECHO) "$(YELLOW)Starting $<...$(DEFAULT_COLOR)"
 	@$(CD) $(OUTPUT_DIR) && ./$(PROJECT_NAME).o
 
+## clean : Clean build artifacts.
 clean:
 	@$(ECHO_NO_NEW_LINE) "$(RED)Cleaning...\t"
 	@$(RM) -rf $(BUILD_DIR)
 	@$(RM) -rf $(BIN_DIR)
 	@$(ECHO_SUCCESS)
 
+## submodule : Add a git sub module. e.g. make submodule module=git@github.com:g-truc/glm.git
 submodule:
 	@$(CD) $(VENDOR_DIR) && $(GIT) submodule add $(module)
 
+## setup-vendor : Fetch all the sub modules.
 setup-vendor:
 	@$(GIT) submodule update --init --recursive
+
+## help : Prints help text.
+help: Makefile
+	@echo "make [COMMAND]"
+	@echo "COMMAND"
+	@sed -n 's/^##//p' $<
