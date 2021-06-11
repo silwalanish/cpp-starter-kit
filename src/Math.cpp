@@ -1,5 +1,11 @@
-#include "Math.hpp"
+#include <Math.hpp>
 
-int add(int a, int b) {
-  return a + b;
-}
+namespace CppStarterKit
+{
+
+  int add(int a, int b)
+  {
+    return a + b;
+  }
+
+} // namespace CppStarterKit
