@@ -6,5 +6,4 @@ BIN_DIR := bin
 LIBS_DIR := libs
 SOURCE_DIR := src
 BUILD_DIR := build
-VENDOR_DIR := vendor
 INCLUDES_DIR := includes

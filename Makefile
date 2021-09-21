@@ -23,7 +23,7 @@ INTERMEDIATE_FILES := $(patsubst $(SOURCE_DIR)/%.cpp, $(INTERMEDIATE_DIR)/%.o, $
 
 EXECUTABLE := $(OUTPUT_DIR)/${EXECUTABLE_NAME}
 
-.PHONY = build compile run clean submodule help
+.PHONY = build compile run clean setup help
 
 ## all : Generates executable
 all: $(EXECUTABLE)
@@ -34,7 +34,12 @@ build: $(EXECUTABLE)
 ## compile : Compiles and generates intermediate files.
 compile: $(INTERMEDIATE_FILES)
 
-$(OUTPUT_DIR)/$(PROJECT_NAME).o: $(INTERMEDIATE_FILES)
+## setup: Installs dependencies.
+setup:
+	@$(MKDIR) $(BUILD_DIR)
+	@$(CD) $(BUILD_DIR) && conan install ..
+
+$(EXECUTABLE): $(INTERMEDIATE_FILES)
 	@$(ECHO_NO_NEW_LINE) "$(BLUE)[$(TARGET_OS) $(TARGET_ARCH)] Linking...\t"
 	@$(MKDIR) $(OUTPUT_DIR)
 	@$(CC) $(CFLAGS) $(CCFLAGS) $(DEBUG_FLAGS) $^ -o $@ -L$(DEPENDENCIES) $(LINK_PARAMS)
@@ -59,20 +64,6 @@ clean:
 	@$(RM) -rf $(BUILD_DIR)
 	@$(RM) -rf $(BIN_DIR)
 	@$(ECHO_SUCCESS)
-
-## submodule : Add a git sub module. e.g. make submodule module=git@github.com:g-truc/glm.git
-submodule:
-	@$(CD) $(VENDOR_DIR) && $(GIT) submodule add $(module)
-
-## remove-submodule : Remove a git sub module. e.g. make remove-submodule module=glm
-remove-submodule:
-	@$(GIT) submodule deinit $(VENDOR_DIR)/$(module)
-	@$(RM) -rf .git/modules/$(VENDOR_DIR)/$(module)
-	@$(GIT) rm -f $(VENDOR_DIR)/$(module)
-
-## setup-vendor : Fetch all the sub modules.
-setup-vendor:
-	@$(GIT) submodule update --init --recursive
 
 ## help : Prints help text.
 help: Makefile
