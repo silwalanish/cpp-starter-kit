@@ -16,3 +16,4 @@ CCFLAGS += $(addprefix -D, $(CONAN_DEFINES))
 # SET LINK_PARAMS for more params for linker
 LINK_PARAMS += $(addprefix -L, $(CONAN_LIB_DIRS))
 LINK_PARAMS += $(addprefix -l, $(CONAN_LIBS))
+LINK_PARAMS += $(addprefix -l, $(CONAN_SYSTEM_LIBS))
