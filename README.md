@@ -4,6 +4,7 @@ A simple attempt at making building c++ projects easier.
 # Features
 - Uses [conan.io](https://conan.io/) to manage dependencies.
 - Uses [make](https://www.gnu.org/software/make/) as build system.
+- Uses [gtest](https://github.com/google/googletest) for unit tests.
 
 # Usage
 - Clone the repository.
@@ -37,6 +38,12 @@ $ make
 Run to execute the project.
 ```bash
 $ make run
+```
+
+## `test`
+Runs the unit tests.
+```bash
+$ make test
 ```
 
 ## `clean`
