@@ -7,8 +7,17 @@ A simple attempt at making building c++ projects easier.
 - Uses [gtest](https://github.com/google/googletest) for unit tests.
 
 # Usage
+## Creating a new project
 - Clone the repository.
 - Update the name and description of the project in the file `ProjectInfo.mk`.
+
+Alternatively,
+- Run the `create-cpp-project` script.
+```bash
+$ bash <(curl -s https://raw.githubusercontent.com/silwalanish/cpp-starter-kit/main/create-cpp-project.sh) -n ${PROJECT_NAME} -p ${PROJECT_PATH}
+```
+
+## Configurations
 - Add any build parameters in `BuildOptions.mk`.
 - Add dependencies in `conanfile.py`.
 
